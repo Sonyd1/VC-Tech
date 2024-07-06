@@ -1,4 +1,3 @@
-// admin/user/+page.server.ts
 import { PrismaClient } from '@prisma/client';
 import type { PageServerLoad, Actions } from './$types';
 
@@ -22,18 +21,46 @@ export const actions: Actions = {
   approve: async ({ request }) => {
     const data = await request.formData();
     const userId = data.get('userId') as string;
-    await prisma.user.update({
-      where: { id: userId },
-      data: { isApproved: true }
-    });
-    return { success: true };
+    
+    try {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { isApproved: true }
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error approving user:', error);
+      return { success: false, error: 'Failed to approve user' };
+    }
   },
+
   decline: async ({ request }) => {
     const data = await request.formData();
     const userId = data.get('userId') as string;
-    await prisma.user.delete({
-      where: { id: userId }
-    });
-    return { success: true };
+    
+    try {
+      await prisma.user.delete({
+        where: { id: userId }
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error declining user:', error);
+      return { success: false, error: 'Failed to decline user' };
+    }
+  },
+
+  deleteApproved: async ({ request }) => {
+    const data = await request.formData();
+    const userId = data.get('userId') as string;
+    
+    try {
+      await prisma.user.delete({
+        where: { id: userId }
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting approved user:', error);
+      return { success: false, error: 'Failed to delete approved user' };
+    }
   }
 };
